@@ -58,28 +58,6 @@ bool BitcoinExchange::validate_header(std:: string header)
     return (1);
 }
 
-bool extract_date(std::string date, int &year,int &day,int &month)
-{
-    std::list<std::string> words = split(date,'-');
-    std::list<std::string>::iterator iter = words.begin();
-
-    if(words.size() != 3)
-        return (false);
-    if(!is_all_digit(*iter) || (*iter).length() < 4)
-        return (false);
-    year = std::atoi((*iter).c_str());
-    iter++;
-    if(!is_number(*iter) || (*iter).length() > 2)
-        return (false);
-    month = std::atoi((*iter).c_str());
-    iter++;
-    // Day check
-    if(!is_number(*iter) || (*iter).length() > 2)
-        return (false);
-    day = std::atoi((*iter).c_str());
-    return (true);
-}
-
 bool BitcoinExchange::validate_date(std::string date)
 {
     int year;
@@ -87,7 +65,7 @@ bool BitcoinExchange::validate_date(std::string date)
     int day;
     if(!extract_date(date, year, day, month))
         return (false);
-    if(month < 1 && month > 12)
+    if(month < 1 || month > 12)
         return (false);
     if((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
         return (false);
@@ -104,6 +82,8 @@ bool BitcoinExchange::validate_date(std::string date)
                 return (false);
         }
     }
+    if(day > 31 || day < 1)
+        return (false);
     return (1);
 }
 
@@ -162,7 +142,7 @@ void BitcoinExchange::process_line(std::string line)
         return invalid_input_err(line);
     if(!validate_date(words.front()))
     {
-        std::cerr << "Invalid date" << std::endl;
+        std::cerr << "Error: Invalid date" << std::endl;
         return;
     }
     if(!validate_value(words.back(), value_err))

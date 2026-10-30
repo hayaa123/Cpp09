@@ -54,3 +54,25 @@ bool is_number(std::string str)
     return(true);
 }
 
+bool extract_date(std::string date, int &year,int &day,int &month)
+{
+    std::list<std::string> words = split(date,'-');
+    std::list<std::string>::iterator iter = words.begin();
+
+    if(words.size() != 3)
+        return (false);
+    if(!is_all_digit(*iter) || (*iter).length() < 4)
+        return (false);
+    year = std::atoi((*iter).c_str());
+    iter++;
+    if(!is_number(*iter) || (*iter).length() > 2)
+        return (false);
+    month = std::atoi((*iter).c_str());
+    iter++;
+    // Day check
+    if(!is_number(*iter) || (*iter).length() > 2)
+        return (false);
+    day = std::atoi((*iter).c_str());
+    return (true);
+}
+
